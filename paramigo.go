@@ -67,7 +67,7 @@ func StdinPush(c *cli.Context) {
 	fmt.Println(b.String())
 }
 
-func InnerPush(hostValue string, portValue string, userValue string, pwValue string, keyValue string, cmdValue string) {
+func InnerPush(hostValue string, portValue string, userValue string, pwValue string, cmdValue string) {
 	ce := func(err error, msg string) {
 		if err != nil {
 			log.Fatalf("%s error: %v", msg, err)
@@ -77,26 +77,14 @@ func InnerPush(hostValue string, portValue string, userValue string, pwValue str
 	// check private key or password.
 	var passwd string
 	auth := []ssh.AuthMethod{}
-	if keyValue != "" {
-		key, err := ioutil.ReadFile(keyValue)
-		ce(err, "private key")
 
-		signer, err := ssh.ParsePrivateKey(key)
-		ce(err, "signer")
-
-		auth = append(auth, ssh.PublicKeys(signer))
+	// check password.
+	if pwValue != "" {
+		passwd = pwValue
 	} else {
-		// check password.
-		if pwValue != "" {
-			passwd = pwValue
-		} else {
-			fmt.Print("Password: ")
-			inPasswd, err := terminal.ReadPassword(int(syscall.Stdin))
-			ce(err, "password")
-			passwd = string(inPasswd)
-		}
-		auth = append(auth, ssh.Password(passwd))
+		log.Println("Password Error")
 	}
+	auth = append(auth, ssh.Password(passwd))
 
 	// set ssh config.
 	sshConfig := &ssh.ClientConfig{
@@ -161,6 +149,6 @@ func StdinCommand() {
 	app.Run(os.Args)
 }
 
-func InnerCommand(host string, port string, user string, pw string, key string, cmd string) {
-	InnerCommand(host, port, user, pw, key, cmd)
+func InnerCommand(host string, port string, user string, pw string, cmd string) {
+	InnerPush(host, port, user, pw, cmd)
 }
