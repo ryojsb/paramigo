@@ -1,4 +1,3 @@
-[![Build Status](https://cloud.drone.io/api/badges/ryojsb/paramigo/status.svg)](https://cloud.drone.io/ryojsb/paramigo)
 # paramigo
 Send te command from local to remote server through ssh.
 
