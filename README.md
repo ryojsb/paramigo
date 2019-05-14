@@ -3,7 +3,7 @@ Send te command from local to remote server through ssh.
 
 # Usage
 
-Usage of StdinCommand:
+### Usage of StdinCommand:
 ```
   -host string
     	ip address
@@ -19,7 +19,7 @@ Usage of StdinCommand:
         command that you want to send
 ```
 
-## Example
+### Example
 
 ```
 package main
@@ -37,7 +37,7 @@ $ go run exapmle.go -host <IP> -port <port> -u <user> -p <password> -cmd <comman
 ```
 
 
-Usage of InnerCommand:
+### Usage of InnerCommand:
 ```
   host string
     	ip address
@@ -51,7 +51,7 @@ Usage of InnerCommand:
         command that you want to send
 ```
 
-## Example
+### Example
 
 ```
 package main
