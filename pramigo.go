@@ -13,7 +13,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func push(c *cli.Context) {
+func StdinPush(c *cli.Context) {
 	ce := func(err error, msg string) {
 		if err != nil {
 			log.Fatalf("%s error: %v", msg, err)
@@ -67,7 +67,61 @@ func push(c *cli.Context) {
 	fmt.Println(b.String())
 }
 
-func SendCommand() {
+func InnerPush(hostValue string, portValue string, userValue string, pwValue string, keyValue string, cmdValue string) {
+	ce := func(err error, msg string) {
+		if err != nil {
+			log.Fatalf("%s error: %v", msg, err)
+		}
+	}
+
+	// check private key or password.
+	var passwd string
+	auth := []ssh.AuthMethod{}
+	if keyValue != "" {
+		key, err := ioutil.ReadFile(keyValue)
+		ce(err, "private key")
+
+		signer, err := ssh.ParsePrivateKey(key)
+		ce(err, "signer")
+
+		auth = append(auth, ssh.PublicKeys(signer))
+	} else {
+		// check password.
+		if pwValue != "" {
+			passwd = pwValue
+		} else {
+			fmt.Print("Password: ")
+			inPasswd, err := terminal.ReadPassword(int(syscall.Stdin))
+			ce(err, "password")
+			passwd = string(inPasswd)
+		}
+		auth = append(auth, ssh.Password(passwd))
+	}
+
+	// set ssh config.
+	sshConfig := &ssh.ClientConfig{
+		User:            userValue,
+		Auth:            auth,
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
+
+	// SSH connect.
+	client, err := ssh.Dial("tcp", hostValue+":"+portValue, sshConfig)
+	ce(err, "dial")
+
+	session, err := client.NewSession()
+	ce(err, "new session")
+	defer session.Close()
+
+	var b bytes.Buffer
+	session.Stdout = &b
+
+	// Finally, run the command
+	err = session.Run(cmdValue)
+	fmt.Println(b.String())
+}
+
+func StdinCommand() {
 	app := cli.NewApp()
 	app.Name = "ssh command runner"
 	app.Usage = "SSh command sending Tool"
@@ -103,6 +157,10 @@ func SendCommand() {
 		},
 	}
 
-	app.Action = push
+	app.Action = StdinPush
 	app.Run(os.Args)
+}
+
+func InnerCommand(host string, port string, user string, pw string, key string, cmd string) {
+	InnerCommand(host, port, user, pw, key, cmd)
 }
