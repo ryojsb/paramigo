@@ -62,10 +62,10 @@ import (
 
 func main() {
     var host string = "192.198.1.1"
-	var port string = "22"
-	var u string = "user"
-	var p string = "password"
-	var cmd string = "ls"
+    var port string = "22"
+    var u string = "user"
+    var p string = "password"
+    var cmd string = "ls"
 	
     paramigo.InnerCommand(host, port, u, p, cmd)
 }
